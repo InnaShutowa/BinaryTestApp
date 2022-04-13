@@ -23,6 +23,29 @@ namespace BinaryTestApp
         {
             open();
             write();
+            toCsv();
+        }
+
+        private void toCsv()
+        {
+            var readData = readSensors();
+            try
+            {
+                using (var sw = new StreamWriter("result.csv", false, Encoding.Default))
+                {
+                    sw.WriteLine("Guid сенсора;Значение до обработки;Округляем до;Значение после обработки (из бинарника);Округляем до (из конфига);Исходное значение (округление, на основе данных из бинарника)");
+
+                    readData.ForEach(data =>
+                    {
+                        sw.WriteLine($"{data.Guid};{data.StartValue};{data.FloatNumber};{data.UpdatedValueFromBinary};{data.FloatNumberFromConfig};{data.StartValueFromBinary}");
+                    });
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error in to_csv. Message: {ex.Message}");
+            }
         }
 
         private void write()
@@ -110,28 +133,6 @@ namespace BinaryTestApp
             catch (Exception ex)
             {
                 _logger.Error($"Error in open. Message: {ex.Message}");
-            }
-        }
-
-
-        public void to_csv()
-        {
-            var readData = readSensors();
-            try
-            {
-                using (var sw = new StreamWriter("result.csv", false, Encoding.Default))
-                {
-                    sw.WriteLine("Guid сенсора;Значение до обработки;Округляем до;Значение после обработки (из бинарника);Округляем до (из конфига);Исходное значение (округление, на основе данных из бинарника)");
-
-                    readData.ForEach(data =>
-                    {
-                        sw.WriteLine($"{data.Guid};{data.StartValue};{data.FloatNumber};{data.UpdatedValueFromBinary};{data.FloatNumberFromConfig};{data.StartValueFromBinary}");
-                    });
-
-                }
-            } catch(Exception ex)
-            {
-                _logger.Error($"Error in to_csv. Message: {ex.Message}");
             }
         }
     }

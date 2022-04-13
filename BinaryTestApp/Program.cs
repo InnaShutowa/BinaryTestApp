@@ -18,7 +18,6 @@ namespace BinaryTestApp
             });
 
             sensorService.SensorValuesWrite();
-            sensorService.to_csv(); 
 
             Console.ReadKey();
         }
