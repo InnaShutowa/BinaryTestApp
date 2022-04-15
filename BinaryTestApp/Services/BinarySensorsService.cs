@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace BinaryTestApp
+namespace BinaryTestApp.Services
 {
     public class BinarySensorsService
     {
@@ -21,7 +21,7 @@ namespace BinaryTestApp
 
         public void SensorValuesWrite()
         {
-            open();
+            writeConfigs();
             write();
             toCsv();
         }
@@ -31,7 +31,7 @@ namespace BinaryTestApp
             var readData = readSensors();
             try
             {
-                using (var sw = new StreamWriter("result.csv", false, Encoding.Default))
+                using (var sw = new StreamWriter(Settings.CsvFileName, false, Encoding.Default))
                 {
                     sw.WriteLine("Guid сенсора;Значение до обработки;Округляем до;Значение после обработки (из бинарника);Округляем до (из конфига);Исходное значение (округление, на основе данных из бинарника)");
 
@@ -52,7 +52,7 @@ namespace BinaryTestApp
         {
             try
             {
-                using (var writer = new BinaryWriter(File.Open("binary.bin", FileMode.Create)))
+                using (var writer = new BinaryWriter(File.Open(Settings.BinaryFileName, FileMode.Create)))
                 {
                     sensorModels.ForEach(sensor =>
                     {
@@ -66,12 +66,15 @@ namespace BinaryTestApp
             }
         }
 
+        /// <summary>
+        /// read information from binary file
+        /// </summary>
         private List<ResultModel> readSensors()
         {
             var result = new List<ResultModel>();
             try
             {
-                using (var reader = new BinaryReader(File.Open("binary.bin", FileMode.Open)))
+                using (var reader = new BinaryReader(File.Open(Settings.BinaryFileName, FileMode.Open)))
                 {
                     var list = new List<int>();
 
@@ -104,7 +107,10 @@ namespace BinaryTestApp
             return result;
         }
 
-        private void open()
+        /// <summary>
+        /// добавляем параметры в configFile
+        /// </summary>
+        private void writeConfigs()
         {
             try
             {
@@ -132,7 +138,7 @@ namespace BinaryTestApp
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error in open. Message: {ex.Message}");
+                _logger.Error($"Error in writeConfigs. Message: {ex.Message}");
             }
         }
     }
